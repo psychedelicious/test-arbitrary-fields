@@ -17,11 +17,24 @@ class CustomField(BaseModel):
     value: str = Field(description="The value")
 
 
+class CustomField2(BaseModel):
+    """A field with some value"""
+
+    value: str = Field(description="The value")
+
+
 @invocation_output("custom_field_output")
 class CustomFieldOutput(BaseInvocationOutput):
     """Base class for nodes that output a single some field"""
 
     my_field: CustomField = OutputField()
+
+
+@invocation_output("custom_field_2_output")
+class CustomField2Output(BaseInvocationOutput):
+    """Base class for nodes that output a single some field"""
+
+    my_field: CustomField2 = OutputField()
 
 
 @invocation(
@@ -44,7 +57,8 @@ class CustomFieldTest1(BaseInvocation):
 class CustomFieldTest2(BaseInvocation):
     """A test primitive"""
 
-    my_field: CustomField = InputField(description="Some field", input=Input.Connection)
+    my_field: CustomField = InputField(description="Some field")
+    another_field: CustomField2 = InputField(description="Another field")
 
     def invoke(self, context: InvocationContext) -> CustomFieldOutput:
         return CustomFieldOutput(my_field=self.my_field)
