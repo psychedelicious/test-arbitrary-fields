@@ -1,8 +1,8 @@
+from typing import Union
 from pydantic import BaseModel, Field
 from invokeai.app.invocations.baseinvocation import (
     BaseInvocation,
     BaseInvocationOutput,
-    Input,
     InputField,
     InvocationContext,
     OutputField,
@@ -11,30 +11,30 @@ from invokeai.app.invocations.baseinvocation import (
 )
 
 
-class CustomField(BaseModel):
+class MyField(BaseModel):
     """A field with some value"""
 
     value: str = Field(description="The value")
 
 
-class CustomField2(BaseModel):
+class AnotherField(BaseModel):
     """A field with some value"""
 
     value: str = Field(description="The value")
 
 
 @invocation_output("custom_field_output")
-class CustomFieldOutput(BaseInvocationOutput):
+class MyFieldOutput(BaseInvocationOutput):
     """Base class for nodes that output a single some field"""
 
-    my_field: CustomField = OutputField()
+    my_field: MyField = OutputField()
 
 
 @invocation_output("custom_field_2_output")
-class CustomField2Output(BaseInvocationOutput):
+class AnotherFieldOutput(BaseInvocationOutput):
     """Base class for nodes that output a single some field"""
 
-    my_field: CustomField2 = OutputField()
+    my_field: AnotherField = OutputField()
 
 
 @invocation(
@@ -42,11 +42,11 @@ class CustomField2Output(BaseInvocationOutput):
     title="Custom Field Test 1",
     version="1.0.0",
 )
-class CustomFieldTest1(BaseInvocation):
+class CustomFieldTest1Invocation(BaseInvocation):
     """A test primitive"""
 
-    def invoke(self, context: InvocationContext) -> CustomFieldOutput:
-        return CustomFieldOutput(my_field=CustomField(value="test"))
+    def invoke(self, context: InvocationContext) -> MyFieldOutput:
+        return MyFieldOutput(my_field=MyField(value="test"))
 
 
 @invocation(
@@ -54,11 +54,17 @@ class CustomFieldTest1(BaseInvocation):
     title="Custom Field Test 2",
     version="1.0.0",
 )
-class CustomFieldTest2(BaseInvocation):
+class CustomFieldTest2Invocation(BaseInvocation):
     """A test primitive"""
 
-    my_field: CustomField = InputField(description="Some field")
-    another_field: CustomField2 = InputField(description="Another field")
+    my_field: MyField = InputField(description="Single CustomField")
+    my_collection_field: list[MyField] = InputField(
+        description="Collection CustomField"
+    )
+    my_polymorphic_field: Union[MyField, list[MyField]] = InputField(
+        description="Polymorphic CustomField"
+    )
+    another_field: AnotherField = InputField(description="Single CustomField2")
 
-    def invoke(self, context: InvocationContext) -> CustomFieldOutput:
-        return CustomFieldOutput(my_field=self.my_field)
+    def invoke(self, context: InvocationContext) -> MyFieldOutput:
+        return MyFieldOutput(my_field=self.my_field)
