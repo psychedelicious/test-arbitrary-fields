@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 from pydantic import BaseModel, Field
 from invokeai.app.invocations.baseinvocation import (
     BaseInvocation,
@@ -57,14 +57,18 @@ class CustomFieldTest1Invocation(BaseInvocation):
 class CustomFieldTest2Invocation(BaseInvocation):
     """A test primitive"""
 
-    my_field: MyField = InputField(description="Single CustomField")
-    my_collection_field: list[MyField] = InputField(
-        description="Collection CustomField"
+    my_field: Optional[MyField] = InputField(
+        default=None, description="Single CustomField"
     )
-    my_polymorphic_field: Union[MyField, list[MyField]] = InputField(
-        description="Polymorphic CustomField"
+    my_collection_field: Optional[list[MyField]] = InputField(
+        default=None, description="Collection CustomField"
     )
-    another_field: AnotherField = InputField(description="Single CustomField2")
+    my_polymorphic_field: Optional[Union[MyField, list[MyField]]] = InputField(
+        default=None, description="Polymorphic CustomField"
+    )
+    another_field: Optional[AnotherField] = InputField(
+        default=None, description="Single CustomField2"
+    )
 
     def invoke(self, context: InvocationContext) -> MyFieldOutput:
         return MyFieldOutput(my_field=self.my_field)
